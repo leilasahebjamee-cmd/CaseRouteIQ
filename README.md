@@ -1,6 +1,6 @@
-# Know You Agent — sample support triage service
+# Know Your Customer — sample support triage service
 
-Know You is a dependency-free Node.js sample that identifies the customer, checks their support entitlement, recommends self-help, finds related open cases, and creates a support case when appropriate.
+Know Your Customer is a dependency-free Node.js sample that identifies the customer, checks their support entitlement, recommends self-help, finds related open cases, and creates a support case when appropriate.
 
 ## Run
 
@@ -20,12 +20,6 @@ The browser has two actions:
 2. **Create support case** calls `POST /api/cases`.
 
 The creation endpoint creates a new open case only when the customer exists, is eligible for their selected channel, and no related open case is found. It returns HTTP `201` for a created case. If an existing case is matched or a channel is not eligible, it returns HTTP `409` and does not create a duplicate.
-
-Example:
-
-```powershell
-Invoke-RestMethod http://localhost:3000/api/cases -Method Post -ContentType 'application/json' -Body '{"customerId":"cust-2002","summary":"My September invoice includes an unfamiliar charge","category":"billing","channel":"email"}'
-```
 
 ## Test
 
