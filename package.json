@@ -1,8 +1,8 @@
 {
-  "name": "know-you-agent-sample",
+  "name": "know-your-customer-agent",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": { "start": "node src/server.js", "test": "node --test" },
-  "description": "Know You customer-aware support triage agent"
+  "description": "Know Your Customer support triage agent"
 }
