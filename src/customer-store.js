@@ -34,6 +34,27 @@ const cases = [
   }
 ];
 
+const selfHelpArticles = [
+  {
+    id: 'kb-101', category: 'authentication',
+    title: 'Fix sign-in and redirect-loop problems',
+    url: 'https://support.example.com/articles/fix-sign-in-redirect-loop',
+    summary: 'Clear session cookies, check your identity provider, and retry sign-in.'
+  },
+  {
+    id: 'kb-202', category: 'billing',
+    title: 'Understand and report duplicate subscription charges',
+    url: 'https://support.example.com/articles/duplicate-subscription-charges',
+    summary: 'Review invoices, pending authorizations, and the information needed for a billing review.'
+  },
+  {
+    id: 'kb-303', category: 'technical',
+    title: 'Troubleshoot failed imports',
+    url: 'https://support.example.com/articles/troubleshoot-imports',
+    summary: 'Check file format, required fields, error logs, and retry steps.'
+  }
+];
+
 export function getCustomer(customerId) {
   return customers.get(customerId) ?? null;
 }
@@ -42,3 +63,6 @@ export function getCasesForOrganization(organizationId) {
   return cases.filter((supportCase) => supportCase.organizationId === organizationId);
 }
 
+export function getSelfHelpArticles(category) {
+  return selfHelpArticles.filter((article) => article.category === category);
+}
