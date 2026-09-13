@@ -30,4 +30,4 @@ createServer(async (request, response) => {
     } catch { return json(response, 400, { status: 'invalid_request', message: 'Body must be valid JSON.' }); }
   }
   response.writeHead(404).end();
-}).listen(port, '0.0.0.0', () => console.log(`Know You Agent sample: http://localhost:${port}`));
+}).listen(port, '0.0.0.0', () => console.log(`Know Your Customer: http://localhost:${port}`));
