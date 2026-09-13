@@ -1,8 +1,17 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { assessSupportRequest } from './know-me-agent.js';
+import { assessSupportRequest, createSupportCase } from './know-me-agent.js';
 
 const port = process.env.PORT || 3000;
+async function readJson(request) {
+  let body = '';
+  for await (const chunk of request) body += chunk;
+  return JSON.parse(body);
+}
+function json(response, status, payload) {
+  response.writeHead(status, { 'content-type': 'application/json' });
+  response.end(JSON.stringify(payload, null, 2));
+}
 
 createServer(async (request, response) => {
   if (request.method === 'GET' && request.url === '/') {
@@ -11,16 +20,14 @@ createServer(async (request, response) => {
     return response.end(page);
   }
   if (request.method === 'POST' && request.url === '/api/assess') {
-    let body = '';
-    for await (const chunk of request) body += chunk;
+    try { return json(response, 200, assessSupportRequest(await readJson(request))); }
+    catch { return json(response, 400, { status: 'invalid_request', message: 'Body must be valid JSON.' }); }
+  }
+  if (request.method === 'POST' && request.url === '/api/cases') {
     try {
-      const assessment = assessSupportRequest(JSON.parse(body));
-      response.writeHead(200, { 'content-type': 'application/json' });
-      return response.end(JSON.stringify(assessment, null, 2));
-    } catch {
-      response.writeHead(400, { 'content-type': 'application/json' });
-      return response.end(JSON.stringify({ status: 'invalid_request', message: 'Body must be valid JSON.' }));
-    }
+      const result = createSupportCase(await readJson(request));
+      return json(response, result.status === 'created' ? 201 : 409, result);
+    } catch { return json(response, 400, { status: 'invalid_request', message: 'Body must be valid JSON.' }); }
   }
   response.writeHead(404).end();
-}).listen(port, () => console.log(`Know You Agent sample: http://localhost:${port}`));
+}).listen(port, '0.0.0.0', () => console.log(`Know You Agent sample: http://localhost:${port}`));
