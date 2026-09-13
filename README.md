@@ -1,14 +1,6 @@
 # Know You Agent — sample support triage service
 
-Know You is a dependency-free Node.js sample that makes a consistent support decision before a case is created:
-
-1. identifies the customer and their service level;
-2. checks which support channels and response targets they are eligible for;
-3. recommends relevant self-help articles;
-4. compares the reported problem with open issues for that customer's organization; and
-5. recommends a new case, an update to an existing case, or self-help first.
-
-The data source is deliberately in-memory so the behaviour is easy to inspect. Replace `src/customer-store.js` with CRM, billing, entitlement, ticketing-system, and approved knowledge-base adapters in production.
+Know You is a dependency-free Node.js sample that identifies the customer, checks their support entitlement, recommends self-help, finds related open cases, and creates a support case when appropriate.
 
 ## Run
 
@@ -18,10 +10,21 @@ Requires Node.js 18+.
 node src/server.js
 ```
 
-Open `http://localhost:3000` or submit a decision directly:
+Open `http://localhost:3000`.
+
+## How case creation works
+
+The browser has two actions:
+
+1. **Find self-help and assess** returns the customer’s eligibility, relevant articles, and whether an open case appears related.
+2. **Create support case** calls `POST /api/cases`.
+
+The creation endpoint creates a new open case only when the customer exists, is eligible for their selected channel, and no related open case is found. It returns HTTP `201` for a created case. If an existing case is matched or a channel is not eligible, it returns HTTP `409` and does not create a duplicate.
+
+Example:
 
 ```powershell
-Invoke-RestMethod http://localhost:3000/api/assess -Method Post -ContentType 'application/json' -Body '{"customerId":"cust-1001","summary":"I cannot sign in to the Analytics dashboard","category":"authentication","channel":"email"}'
+Invoke-RestMethod http://localhost:3000/api/cases -Method Post -ContentType 'application/json' -Body '{"customerId":"cust-2002","summary":"My September invoice includes an unfamiliar charge","category":"billing","channel":"email"}'
 ```
 
 ## Test
@@ -30,32 +33,6 @@ Invoke-RestMethod http://localhost:3000/api/assess -Method Post -ContentType 'ap
 node --test
 ```
 
-## Self-help behaviour
+## Important demo limitation
 
-For a recognized category, the agent returns a `selfHelp` object with approved article titles, links, and short summaries. For a new issue with relevant guidance, its recommendation is `offer_self_help_then_create_case`: the customer can try the article first and still create a case if the issue remains unresolved. An existing open case continues to take precedence.
-
-## API
-
-`POST /api/assess`
-
-```json
-{
-  "customerId": "cust-1001",
-  "summary": "I cannot sign in to the Analytics dashboard",
-  "category": "authentication",
-  "channel": "email"
-}
-```
-
-The response includes the matched customer profile, service entitlement, self-help recommendation, duplicate/recurrence assessment, and a safe next action. It avoids exposing other customers' case details.
-
-## Production notes
-
-- Authenticate the caller and derive `customerId` from the authenticated identity.
-- Treat service entitlements as server-side data; do not accept them from browser input.
-- Use a privacy-reviewed vector or keyword search only within the caller's organization.
-- Serve only approved and current knowledge-base articles.
-- Send confidence below the selected threshold to an agent for review.
-- Audit every entitlement, self-help, and case-match decision.
-
-The pattern maps well to an OpenAI tool-using agent: expose customer lookup, entitlement lookup, organization-scoped case search, and approved knowledge-base search as server-side tools. Keep service eligibility and access controls in deterministic code rather than leaving them to model judgment.
+Cases are stored in memory and are lost when the application restarts or is redeployed. Before using this with real customers, replace the sample store with a database or ticketing-system integration, authenticate users, derive the customer identity on the server, and use approved knowledge-base links. Do not treat this demo’s sample customer data or example URLs as production data.
