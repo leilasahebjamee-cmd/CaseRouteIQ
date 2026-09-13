@@ -1,4 +1,4 @@
-# Know Me Agent — sample support triage service
+# Know You Agent — sample support triage service
 
 This small, dependency-free Node.js sample shows how a support agent can make a consistent decision before a case is created:
 
@@ -53,4 +53,3 @@ The response includes the matched customer profile, service entitlement, duplica
 - Audit every entitlement and case-match decision.
 
 The pattern maps well to an OpenAI tool-using agent: expose customer lookup, entitlement lookup, and organization-scoped case search as server-side tools, then require the model to return this response schema. The sample keeps the deterministic policy layer separate so service eligibility is never left to model judgment alone.
-
