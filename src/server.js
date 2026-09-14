@@ -8,6 +8,7 @@ async function page(response, filename) { const content = await readFile(new URL
 createServer(async (request, response) => {
   if (request.method === 'GET' && request.url === '/') return page(response, 'index.html');
   if (request.method === 'GET' && request.url === '/agent') return page(response, 'agent.html');
+  if (request.method === 'GET' && request.url === '/favicon.svg') { const icon = await readFile(new URL('../public/favicon.svg', import.meta.url)); response.writeHead(200, { 'content-type': 'image/svg+xml', 'cache-control': 'public, max-age=86400' }); return response.end(icon); }
   if (request.method === 'GET' && request.url === '/assets/kyc-hero.png') { const asset = await readFile(new URL('../kyc-hero.png', import.meta.url)); response.writeHead(200, { 'content-type': 'image/png', 'cache-control': 'public, max-age=31536000, immutable' }); return response.end(asset); }
   if (request.method === 'POST' && request.url === '/api/assess') { try { return json(response, 200, await assessSupportRequest(await readJson(request))); } catch { return json(response, 400, { status: 'invalid_request', message: 'Body must be valid JSON.' }); } }
   if (request.method === 'POST' && request.url === '/api/cases') { try { const result = await createSupportCase(await readJson(request)); return json(response, result.status === 'created' ? 201 : 409, result); } catch { return json(response, 400, { status: 'invalid_request', message: 'Body must be valid JSON.' }); } }
