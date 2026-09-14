@@ -1,3 +1,5 @@
+create extension if not exists pgcrypto;
+
 -- Run this in Supabase SQL Editor. It creates only fictional demo records.
 create table if not exists customers (
   customer_id text primary key,
