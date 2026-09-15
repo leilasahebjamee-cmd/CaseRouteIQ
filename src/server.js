@@ -13,4 +13,4 @@ createServer(async (request, response) => {
   if (request.method === 'POST' && request.url === '/api/assess') { try { return json(response, 200, await assessSupportRequest(await readJson(request))); } catch { return json(response, 400, { status: 'invalid_request', message: 'Body must be valid JSON.' }); } }
   if (request.method === 'POST' && request.url === '/api/cases') { try { const result = await createSupportCase(await readJson(request)); return json(response, result.status === 'created' ? 201 : 409, result); } catch { return json(response, 400, { status: 'invalid_request', message: 'Body must be valid JSON.' }); } }
   response.writeHead(404).end();
-}).listen(port, '0.0.0.0', () => console.log(`Know Your Customer: http://localhost:${port}`));
+}).listen(port, '0.0.0.0', () => console.log(`CaseRouteIQ: http://localhost:${port}`));
